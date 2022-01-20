@@ -1,6 +1,181 @@
+<main>
+  <div class="container">
+    <input type="hidden" id="id" value="0" />
+    <div>
+      <label for="exampleInputName">Name*
+        <label id="msgname" style="color: red;"></label>
+      </label>
+      <input type="text" class="form-control" onkeyup="validatename()" id="name" aria-describedby="emailHelp" placeholder="Enter Name">
+    </div>
+    <br>
+    <div>
+      <label for="exampleInputEmail1">Email*
+        <label id="msgemail" style="color: red;"></label>
+      </label>
+      <input type="text" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Enter email">
+    </div>
+    <br>
+    <div>
+      <label for="exampleInputcity">City*
+        <label id="msgcity" style="color: red;"></label>
+      </label>
+      <input type="text" class="form-control" id="city" aria-describedby="emailHelp" placeholder="Enter City">
+    </div>
+    <br>
+    <div class="form-group">
+      <label for="exampleInputMobileNumber">Mobile Number*
+        <label id="msgmobileno" style="color: red;"></label>
+      </label>
+      <input type="text" class="form-control" id="mobileno" placeholder="Enter Mobile Number">
+    </div>
+    <br>
+    <!-- submit button -->
+    <div class="text-center">
+      <button type="submit" class="btn btn-primary " onclick="submit()">Submit</button>
+    </div>
+  </div>
+</main>
 
-    <main>
-      Hello
-    </main>
+<script>
 
-    
+  $(document).ready(function() {
+    let id = getUrlParameter("id");
+    if(id != false)
+    {
+      $("#id").val(id);
+      let mydata = {
+          data:{
+              id:$("#id").val()
+          }
+      };
+      $.ajax({
+            url: 'http://localhost:8081/get',
+            type: 'post',            
+            data: mydata,
+            dataType:"json",
+            success: function (data) {
+              let user = data["data"][0];
+              $("#name").val(user.name);
+              $("#email").val(user.email);
+              $("#mobileno").val(user.mobileno);
+              $("#city").val(user.city);
+            },
+            error:function (err) {              
+              alert("Error");
+            }
+        });
+
+
+    }
+  });
+
+  function validatename()
+  {
+    let name = $("#name").val();
+    if(name.trim() != "")
+    {
+      $("#msgname").html("");
+    }
+  }
+
+  function submit() {
+    let name = $("#name").val();
+    let email = $("#email").val();
+    let city = $("#city").val();
+    let mobileno = $("#mobileno").val();
+
+    let validated = true;
+    $("#msgname").html("");
+    $("#msgemail").html("");
+    $("#msgcity").html("");
+    $("#msgmobileno").html("");
+
+    if(name.trim() == "")
+    {
+      $("#msgname").html("Enter name");
+      validated = false;
+    }
+    if(email.trim() == "")
+    {
+      $("#msgemail").html("Enter email");
+      validated = false;
+    }
+    else{
+      if(emailvalidate(email) == false)
+      {
+        $("#msgemail").html("Enter valid email");
+        validated = false;
+      }
+    }    
+    if(city.trim() == "")
+    {
+      $("#msgcity").html("Enter city");
+      validated = false;
+    }
+    if(mobileno.trim() == "")
+    {
+      $("#msgmobileno").html("Enter mobileno");
+      validated = false;
+    }
+    else{
+      if(phonevalidate(mobileno) == false)
+      {
+        $("#msgmobileno").html("Enter valid mobile no");
+        validated = false;
+      }
+    }
+    if(validated)
+    {
+      let mydata = {
+          data:{
+              id:$("#id").val(),
+              name:name,
+              email:email,
+              mobileno:mobileno,
+              city:city
+          }
+      };
+      $.ajax({
+            url: 'http://localhost:8081/save',
+            type: 'post',            
+            data: mydata,
+            dataType:"json",
+            success: function (data) {
+              //alert("Success");
+              window.location.href = "http://localhost:8081/";
+            },
+            error:function (err) {              
+              alert("Error");
+            }
+        });
+    }   
+  }
+
+  function emailvalidate(email) {
+    var pattern = new RegExp(/^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/);
+    var result = pattern.test(email);
+    return result;
+  }
+
+  function phonevalidate(phone) {
+    var pattern = new RegExp(/^(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[789]\d{9}$/);
+    var result = pattern.test(phone);
+    return result;
+  }
+
+  var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = window.location.search.substring(1),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+        }
+    }
+    return false;
+};
+</script>

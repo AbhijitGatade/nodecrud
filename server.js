@@ -64,7 +64,7 @@ app.post("/save", (req, res) => {
         }
         con.query(query, (err, result) => {
             console.log("inserted");
-            res.send("success");
+            res.send({data:{status:"success"}});
         })
 
     })
@@ -94,7 +94,7 @@ app.post("/delete", (req, res) => {
     
         con.query(query, (err, result) => {
             console.log("deleted sucessfully");
-            res.send("success delete");
+            res.send({data:{status:"success"}});
         })
     })
 })
@@ -124,6 +124,10 @@ app.post("/get", (req, res) => {
             query = "select * from users where id=" + id;
         }
         con.query(query, (err, result) => {
+            if(err)
+            {
+                console.log("Error " + err);
+            }
             console.log("inserted");
             res.send({data:result});
         })
